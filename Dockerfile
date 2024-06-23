@@ -7,6 +7,7 @@ RUN --mount=type=cache,sharing=private,target=/var/cache/apk \
     # Tools to extract Zig
     { \
         apk add \
+            file \
             tar \
             xz \
         ; \
