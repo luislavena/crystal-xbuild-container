@@ -9,4 +9,4 @@ build: $(DOCKERFILE)
 
 .PHONY: run
 run: $(DOCKERFILE)
-	docker run -it --rm ${IMAGE_NAME}:${VERSION} sh -i
+	docker run -it --rm -v .:/app -w /app ${IMAGE_NAME}:${VERSION} sh -i
