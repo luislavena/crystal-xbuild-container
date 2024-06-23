@@ -10,3 +10,7 @@ build: $(DOCKERFILE)
 .PHONY: run
 run: $(DOCKERFILE)
 	docker run -it --rm -v .:/app -w /app ${IMAGE_NAME}:${VERSION} sh -i
+
+.PHONY: ubuntu
+ubuntu:
+	docker run -it --rm --platform linux/amd64 -v .:/app -w /app ubuntu:24.04 bash -i
