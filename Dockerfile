@@ -58,12 +58,23 @@ RUN --mount=type=cache,sharing=private,target=/var/cache/apk \
             # use apk to download the specific packages
             apk add --root $target_path --arch $target_arch --initdb --no-cache --no-scripts --allow-untrusted \
                 gc-dev \
+                gmp-dev \
+                libevent-dev \
                 libevent-static \
+                openssl-dev \
+                openssl-libs-static \
                 pcre2-dev \
+                sqlite-dev \
+                sqlite-static \
+                yaml-dev \
+                yaml-static \
+                zlib-dev \
+                zlib-static \
             ; \
             pkg_path="/opt/multiarch-libs/$target_arch-linux-musl"; \
-            mkdir -p $pkg_path/lib; \
-            # copy the static libs
-            cp $target_path/usr/lib/*.a $pkg_path/lib; \
+            mkdir -p $pkg_path/lib/pkgconfig; \
+            # copy the static libs & .pc files
+            cp $target_path/usr/lib/*.a $pkg_path/lib/; \
+            cp $target_path/usr/lib/pkgconfig/*.pc $pkg_path/lib/pkgconfig/; \
         done; \
     }
