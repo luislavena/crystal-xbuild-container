@@ -48,13 +48,15 @@ RUN --mount=type=cache,sharing=private,target=/var/cache/apk \
     --mount=type=tmpfs,target=/tmp \
     set -eux -o pipefail; \
     supported_arch="aarch64 x86_64"; \
+    target_alpine=3.20; \
     # download and extract packages for each arch
     { \
         cd /tmp; \
         for target_arch in $supported_arch; do \
             target_path="/tmp/$target_arch-apk-chroot"; \
             mkdir -p $target_path/etc/apk; \
-            cp /etc/apk/repositories $target_path/etc/apk/; \
+            # patch apk repositories to $target_alpine version
+            sed -E "s/v\d\.\d+/v$target_alpine/g" /etc/apk/repositories | tee $target_path/etc/apk/repositories; \
             # use apk to download the specific packages
             apk add --root $target_path --arch $target_arch --initdb --no-cache --no-scripts --allow-untrusted \
                 gc-dev \
