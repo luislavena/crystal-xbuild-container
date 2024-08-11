@@ -43,14 +43,17 @@ RUN --mount=type=cache,sharing=private,target=/var/cache/apk \
     zig version; \
     zig cc --version
 
+# ---
+# Alpine Linux
+
 # install multi-arch libraries
 RUN --mount=type=cache,sharing=private,target=/var/cache/apk \
     --mount=type=tmpfs,target=/tmp \
     set -eux -o pipefail; \
-    supported_arch="aarch64 x86_64"; \
-    target_alpine=3.20; \
-    # download and extract packages for each arch
+    # Alpine Linux: download and extract packages for each arch
     { \
+        supported_arch="aarch64 x86_64"; \
+        target_alpine=3.20; \
         cd /tmp; \
         for target_arch in $supported_arch; do \
             target_path="/tmp/$target_arch-apk-chroot"; \
@@ -80,3 +83,35 @@ RUN --mount=type=cache,sharing=private,target=/var/cache/apk \
             cp $target_path/usr/lib/pkgconfig/*.pc $pkg_path/lib/pkgconfig/; \
         done; \
     }
+
+# ---
+# macOS
+
+# install macOS dependencies in separate target
+FROM base AS macos-packages
+COPY ./scripts/homebrew-downloader.cr /homebrew-downloader.cr
+
+RUN --mount=type=cache,sharing=private,target=/var/cache/apk \
+    --mount=type=tmpfs,target=/tmp \
+    set -eux -o pipefail; \
+    # macOS (Monterey), supports only Apple Silicon (aarch64/arm64)
+    { \
+        pkg_path="/opt/multiarch-libs/aarch64-apple-darwin"; \
+        mkdir -p $pkg_path/lib/pkgconfig; \
+        # run homebrew-downloader
+        crystal run /homebrew-downloader.cr -- \
+            $pkg_path \
+            gmp \
+            libevent \
+            libgc \
+            libyaml \
+            openssl \
+            pcre2 \
+            sqlite \
+            zlib \
+        ; \
+    }
+
+# copy macOS dependencies back into `base`
+FROM base
+COPY --from=macos-packages --chmod=0444 /opt/multiarch-libs/aarch64-apple-darwin /opt/multiarch-libs/aarch64-apple-darwin
