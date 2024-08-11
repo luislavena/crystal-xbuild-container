@@ -134,3 +134,6 @@ RUN --mount=type=cache,sharing=private,target=/var/cache/apk \
         # symlink to latest version
         ln -nfs /opt/multiarch-libs/MacOSX${MACOS_SDK_VERSION}.sdk /opt/multiarch-libs/MacOSX${MACOS_SDK_MAJOR_VERSION}.sdk; \
     }
+
+# copy xbuild helper
+COPY ./scripts/xbuild.sh /usr/local/bin/xbuild
