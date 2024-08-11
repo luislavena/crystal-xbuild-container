@@ -1,7 +1,7 @@
 # crystal-xbuild
 > 🧪 Container image to ease cross-compilation of Crystal applications (experiment)
 
-This repository is the companion of some posts on [my site](https://luislavena.info/writing/cross-compiling-crystal-applications-part-1/)
+This repository is the companion of some posts on [my site](https://luislavena.info/writing/cross-compiling-crystal-applications-part-1/) and [part 2](https://luislavena.info/writing/cross-compiling-crystal-applications-part-2/)
 
 ## Contribution policy
 
