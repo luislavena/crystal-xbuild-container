@@ -115,3 +115,22 @@ RUN --mount=type=cache,sharing=private,target=/var/cache/apk \
 # copy macOS dependencies back into `base`
 FROM base
 COPY --from=macos-packages --chmod=0444 /opt/multiarch-libs/aarch64-apple-darwin /opt/multiarch-libs/aarch64-apple-darwin
+
+# install macOS SDK
+RUN --mount=type=cache,sharing=private,target=/var/cache/apk \
+    --mount=type=tmpfs,target=/tmp \
+    set -eux -o pipefail; \
+    { \
+        cd /tmp; \
+        export \
+            MACOS_SDK_VERSION=12.3 \
+            MACOS_SDK_MAJOR_VERSION=12 \
+            MACOS_SDK_SHA256=3abd261ceb483c44295a6623fdffe5d44fc4ac2c872526576ec5ab5ad0f6e26c \
+        ; \
+        wget -q -O sdk.tar.xz https://github.com/joseluisq/macosx-sdks/releases/download/${MACOS_SDK_VERSION}/MacOSX${MACOS_SDK_VERSION}.sdk.tar.xz; \
+        echo "${MACOS_SDK_SHA256} *sdk.tar.xz" | sha256sum -c - >/dev/null 2>&1; \
+        tar -C /opt/multiarch-libs -xf sdk.tar.xz; \
+        rm sdk.tar.xz; \
+        # symlink to latest version
+        ln -nfs /opt/multiarch-libs/MacOSX${MACOS_SDK_VERSION}.sdk /opt/multiarch-libs/MacOSX${MACOS_SDK_MAJOR_VERSION}.sdk; \
+    }
