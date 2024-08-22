@@ -50,7 +50,18 @@ object_file="${TMPDIR:-/tmp}/$(basename "${filename%.*}-$target_platform.o")"
 
 # capture output from build
 pkg_config_libdir="$multiarch_root/$target_platform/lib/pkgconfig"
-build_output=$(PKG_CONFIG_LIBDIR="$pkg_config_libdir" crystal build --release --no-debug --static --cross-compile --target "$target_platform" "$filename" -o "$object_file")
+build_cmd="crystal build --release --no-debug --static --cross-compile --target $target_platform"
+
+case $target_platform in
+  # forces usage of libiconv for macOS
+  # Ref: https://github.com/crystal-lang/crystal/pull/14651#issuecomment-2159357235
+  *-apple-darwin)
+    build_cmd="${build_cmd} -Duse_libiconv"
+    ;;
+  *)
+    ;;
+esac
+build_output=$(PKG_CONFIG_LIBDIR="$pkg_config_libdir" $build_cmd "$filename" -o "$object_file")
 
 # check if build succeeded before proceeding
 if [ $? -ne 0 ]; then
@@ -68,8 +79,8 @@ if [[ "$build_output" =~ "lssl" ]]; then
    libs="${libs/crypto/ssl -lcrypto}"
 fi
 
-# when targeting `musl`, also include `unwind` as library
 case $target_platform in
+  # when targeting `musl`, also include `unwind` as library
   *-linux-musl)
     libs="$libs -lunwind"
     ;;
