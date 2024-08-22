@@ -1,3 +1,4 @@
+require "file_utils"
 require "http/client"
 require "json"
 require "log"
@@ -53,7 +54,9 @@ def main(argv = ARGV, log = Log)
 
   # ensure directory exists
   log.debug &.emit("Creating target directory", target_dir: target_dir)
-  Dir.mkdir_p(target_dir)
+  target_dir_lib = File.join(target_dir, "lib")
+  target_dir_pkgconfig = File.join(target_dir_lib, "pkgconfig")
+  Dir.mkdir_p(target_dir_pkgconfig, 0o755)
 
   packages = argv[0..-1].to_set
   if packages.empty?
@@ -92,16 +95,29 @@ def main(argv = ARGV, log = Log)
     temp_io.flush
     log.debug &.emit("File downloaded", path: temp_io.path, size: temp_io.size)
 
-    # extract temporary only .a and .pc from .tar.gz in `target_dir`
-    status = Process.run("tar", {"-xf", temp_io.path, "-C", target_dir, "--strip-components=2", "--wildcards", "--no-anchored", "*.a", "*.pc"})
+    temp_dir = File.tempname
+    Dir.mkdir_p(temp_dir, 0o755)
+
+    log.debug &.emit("Extracting package", path: temp_io.path, target: temp_dir)
+    status = Process.run("tar", {"-xf", temp_io.path, "-C", temp_dir, "--strip-components=2"})
     unless status.success?
       log.error &.emit("Unable to extract package", name: entry.name, version: entry.version, exit_status: status.exit_status)
       exit 1
     end
 
+    Dir.glob(File.join(temp_dir, "**/*.a")).each do |source|
+      FileUtils.cp(source, target_dir_lib)
+    end
+
+    Dir.glob(File.join(temp_dir, "**/*.pc")).each do |source|
+      FileUtils.cp(source, target_dir_pkgconfig)
+    end
+
     log.info &.emit("Extracted files (.a, .pc) from package", name: entry.name, version: entry.version)
   ensure
+    log.debug &.emit("Cleanup after package", name: entry.name, version: entry.version)
     temp_io.delete if temp_io
+    FileUtils.rm_rf(temp_dir) if temp_dir
   end
 end
 
