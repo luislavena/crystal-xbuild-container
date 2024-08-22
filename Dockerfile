@@ -97,15 +97,14 @@ RUN --mount=type=cache,sharing=private,target=/var/cache/apk \
     # macOS (Monterey), supports only Apple Silicon (aarch64/arm64)
     { \
         pkg_path="/opt/multiarch-libs/aarch64-apple-darwin"; \
-        mkdir -p $pkg_path/lib/pkgconfig; \
-        # run homebrew-downloader
         crystal run /homebrew-downloader.cr -- \
             $pkg_path \
             gmp \
             libevent \
             libgc \
+            libiconv \
             libyaml \
-            openssl \
+            openssl@3 \
             pcre2 \
             sqlite \
             zlib \
@@ -114,7 +113,7 @@ RUN --mount=type=cache,sharing=private,target=/var/cache/apk \
 
 # copy macOS dependencies back into `base`
 FROM base
-COPY --from=macos-packages --chmod=0444 /opt/multiarch-libs/aarch64-apple-darwin /opt/multiarch-libs/aarch64-apple-darwin
+COPY --from=macos-packages /opt/multiarch-libs/aarch64-apple-darwin /opt/multiarch-libs/aarch64-apple-darwin
 
 # install macOS SDK
 RUN --mount=type=cache,sharing=private,target=/var/cache/apk \
