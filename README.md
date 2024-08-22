@@ -25,7 +25,7 @@ You can use the following one-liner to cross-compile an application and have
 the artifacts placed in the local `build/` directory:
 
 ```console
-$ docker run --rm -v $(pwd):/app -w /app crystal-xbuild:latest xbuild examples/hello.cr hello-mac aarch64-apple-darwin
+$ docker run --rm -u $(id -u):$(id -g) -v $(pwd):/app -w /app crystal-xbuild:latest xbuild examples/hello.cr hello-mac aarch64-apple-darwin
 Compiling 'build/aarch64-apple-darwin/hello-mac' ('examples/hello.cr')...
 Linking with: -lpcre2-8 -lgc -lpthread -levent -liconv
 Done.

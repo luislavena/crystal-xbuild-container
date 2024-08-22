@@ -129,7 +129,7 @@ RUN --mount=type=cache,sharing=private,target=/var/cache/apk \
         ; \
         wget -q -O sdk.tar.xz https://github.com/joseluisq/macosx-sdks/releases/download/${MACOS_SDK_VERSION}/MacOSX${MACOS_SDK_VERSION}.sdk.tar.xz; \
         echo "${MACOS_SDK_SHA256} *sdk.tar.xz" | sha256sum -c - >/dev/null 2>&1; \
-        tar -C /opt/multiarch-libs -xf sdk.tar.xz; \
+        tar -C /opt/multiarch-libs -xf sdk.tar.xz --no-same-owner; \
         rm sdk.tar.xz; \
         # symlink to latest version
         ln -nfs /opt/multiarch-libs/MacOSX${MACOS_SDK_VERSION}.sdk /opt/multiarch-libs/MacOSX${MACOS_SDK_MAJOR_VERSION}.sdk; \
