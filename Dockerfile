@@ -66,6 +66,10 @@ RUN --mount=type=cache,sharing=private,target=/var/cache/apk \
                 gmp-dev \
                 libevent-dev \
                 libevent-static \
+                libsodium-dev \
+                libsodium-static \
+                libxml2-dev \
+                libxml2-static \
                 openssl-dev \
                 openssl-libs-static \
                 pcre2-dev \
@@ -103,6 +107,8 @@ RUN --mount=type=cache,sharing=private,target=/var/cache/apk \
             libevent \
             libgc \
             libiconv \
+            libsodium \
+            libxml2 \
             libyaml \
             openssl@3 \
             pcre2 \
