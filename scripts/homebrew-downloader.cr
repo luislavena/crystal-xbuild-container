@@ -101,7 +101,7 @@ def main(argv = ARGV, log = Log)
     log.debug &.emit("Extracting package", path: temp_io.path, target: temp_dir)
     status = Process.run("tar", {"-xf", temp_io.path, "-C", temp_dir, "--strip-components=2"})
     unless status.success?
-      log.error &.emit("Unable to extract package", name: entry.name, version: entry.version, exit_status: status.exit_status)
+      log.error &.emit("Unable to extract package", name: entry.name, version: entry.version, system_exit_status: status.system_exit_status)
       exit 1
     end
 

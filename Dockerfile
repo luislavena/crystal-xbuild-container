@@ -1,4 +1,4 @@
-FROM ghcr.io/luislavena/hydrofoil-crystal:1.12 AS base
+FROM ghcr.io/luislavena/hydrofoil-crystal:1.15 AS base
 
 # install cross-compiler (Zig)
 RUN --mount=type=cache,sharing=private,target=/var/cache/apk \
@@ -53,7 +53,7 @@ RUN --mount=type=cache,sharing=private,target=/var/cache/apk \
     # Alpine Linux: download and extract packages for each arch
     { \
         supported_arch="aarch64 x86_64"; \
-        target_alpine=3.20; \
+        target_alpine=3.21; \
         cd /tmp; \
         for target_arch in $supported_arch; do \
             target_path="/tmp/$target_arch-apk-chroot"; \
