@@ -15,14 +15,14 @@ struct BrewFormula
 
   @versions : {stable: String}
 
-  @bottle : {stable: {files: {arm64_monterey: BottleFile?, monterey: BottleFile?}}}
+  @bottle : {stable: {files: {arm64_ventura: BottleFile?, ventura: BottleFile?}}}
 
   def version
     @versions[:stable]
   end
 
-  def arm64_monterey?
-    @bottle[:stable][:files][:arm64_monterey]
+  def arm64_ventura?
+    @bottle[:stable][:files][:arm64_ventura]
   end
 end
 
@@ -76,10 +76,10 @@ def main(argv = ARGV, log = Log)
       log.debug &.emit("Formula found", name: formula.name, version: formula.version)
 
       # collect URLs
-      if file = formula.arm64_monterey?
+      if file = formula.arm64_ventura?
         download_entries << DownloadEntry.new(formula.name, formula.version, file[:url], file[:sha256])
       else
-        log.warn &.emit("No ARM64 Monterey download found", name: formula.name, version: formula.version)
+        log.warn &.emit("No ARM64 Ventura download found", name: formula.name, version: formula.version)
       end
     end
   end

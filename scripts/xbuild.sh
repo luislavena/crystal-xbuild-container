@@ -17,7 +17,7 @@ executable_name=$2
 target_platform=$3
 
 multiarch_root="/opt/multiarch-libs"
-macos_sdk_version="12"
+macos_sdk_version="13"
 
 # Check if the filename exists
 if [ ! -f "$filename" ]; then

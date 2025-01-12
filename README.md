@@ -43,7 +43,7 @@ build/aarch64-apple-darwin/hello-mac: Mach-O 64-bit executable arm64
 At this time, the following are the only supported platforms:
 
 * Alpine Linux: x86_64 (64bits) and aarch64 (ARM64)
-* macOS: aarch64 (ARM64), SDK version 12 (Monterey)
+* macOS: aarch64 (ARM64), SDK version 13 (Ventura)
 
 ## Contribution policy
 

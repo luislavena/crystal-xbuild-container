@@ -98,7 +98,7 @@ COPY ./scripts/homebrew-downloader.cr /homebrew-downloader.cr
 RUN --mount=type=cache,sharing=private,target=/var/cache/apk \
     --mount=type=tmpfs,target=/tmp \
     set -eux -o pipefail; \
-    # macOS (Monterey), supports only Apple Silicon (aarch64/arm64)
+    # macOS (Ventura), supports only Apple Silicon (aarch64/arm64)
     { \
         pkg_path="/opt/multiarch-libs/aarch64-apple-darwin"; \
         crystal run /homebrew-downloader.cr -- \
@@ -128,9 +128,9 @@ RUN --mount=type=cache,sharing=private,target=/var/cache/apk \
     { \
         cd /tmp; \
         export \
-            MACOS_SDK_VERSION=12.3 \
-            MACOS_SDK_MAJOR_VERSION=12 \
-            MACOS_SDK_SHA256=3abd261ceb483c44295a6623fdffe5d44fc4ac2c872526576ec5ab5ad0f6e26c \
+            MACOS_SDK_VERSION=13.3 \
+            MACOS_SDK_MAJOR_VERSION=13 \
+            MACOS_SDK_SHA256=518e35eae6039b3f64e8025f4525c1c43786cc5cf39459d609852faf091e34be \
         ; \
         wget -q -O sdk.tar.xz https://github.com/joseluisq/macosx-sdks/releases/download/${MACOS_SDK_VERSION}/MacOSX${MACOS_SDK_VERSION}.sdk.tar.xz; \
         echo "${MACOS_SDK_SHA256} *sdk.tar.xz" | sha256sum -c - >/dev/null 2>&1; \
