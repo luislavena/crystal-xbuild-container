@@ -61,7 +61,6 @@ jobs:
             This is the latest continuous build from the `main` branch.
 
             Commit: `${{ github.sha }}`
-            Built on: $(date -u +'%Y-%m-%d %H:%M:%S UTC')
 
             Container image:
             - `ghcr.io/luislavena/crystal-xbuild:tip`
