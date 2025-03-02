@@ -1,0 +1,69 @@
+name: Release Tip
+
+on:
+  push:
+    branches:
+      - main
+
+# We must only run one release workflow at a time to prevent corrupting
+# our release artifacts.
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  build-container:
+    runs-on: ubuntu-latest
+    permissions:
+      # allow Depot to connect with GitHub via OIDC
+      id-token: write
+      # allow creating/updating releases
+      contents: write
+      # allow pushing to GitHub Container Registry (ghcr.io)
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Depot CLI
+        uses: depot/setup-action@v1
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push container image
+        uses: depot/build-push-action@v1
+        with:
+          project: ${{ secrets.DEPOT_PROJECT_ID }}
+          context: .
+          push: true
+          tags: |
+            ghcr.io/luislavena/crystal-xbuild:tip
+
+      - name: Create or update tip tag
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -f -a tip -m "Latest continuous build" ${GITHUB_SHA}
+          git push origin --force tip
+
+      - name: Create or update tip release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: tip
+          name: "Latest continuous build (tip)"
+          target_commitish: ${{ github.sha }}
+          body: |
+            This is the latest continuous build from the `main` branch.
+
+            Commit: `${{ github.sha }}`
+            Built on: $(date -u +'%Y-%m-%d %H:%M:%S UTC')
+
+            Container image:
+            - `ghcr.io/luislavena/crystal-xbuild:tip`
+          prerelease: true
+          draft: false
