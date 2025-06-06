@@ -6,8 +6,8 @@ set -eu
 supported_platforms="x86_64-linux-musl aarch64-linux-musl aarch64-apple-darwin"
 
 # Check if the required number of parameters is provided
-if [ $# -ne 3 ]; then
-  echo "Usage: $0 <filename> <executable_name> <target_platform>"
+if [ $# -lt 3 ]; then
+  echo "Usage: $0 <filename> <executable_name> <target_platform> [extra_flags...]"
   exit 1
 fi
 
@@ -15,6 +15,10 @@ fi
 filename=$1
 executable_name=$2
 target_platform=$3
+
+# Shift the first 3 arguments to capture any extra flags
+shift 3
+extra_flags="$@"
 
 multiarch_root="/opt/multiarch-libs"
 macos_sdk_version="13"
@@ -61,6 +65,12 @@ case $target_platform in
   *)
     ;;
 esac
+
+# Append any extra flags if provided
+if [ -n "$extra_flags" ]; then
+  build_cmd="${build_cmd} ${extra_flags}"
+fi
+
 build_output=$(PKG_CONFIG_LIBDIR="$pkg_config_libdir" $build_cmd "$filename" -o "$object_file")
 
 # check if build succeeded before proceeding
