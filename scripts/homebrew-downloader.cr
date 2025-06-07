@@ -24,6 +24,10 @@ struct BrewFormula
   def arm64_ventura?
     @bottle[:stable][:files][:arm64_ventura]
   end
+
+  def ventura?
+    @bottle[:stable][:files][:ventura]
+  end
 end
 
 record DownloadEntry, name : String, version : String, url : String, sha256 : String
@@ -45,7 +49,23 @@ def ghcr_download(uri : URI, headers : HTTP::Headers, target_io : IO)
   end
 end
 
+enum SupportedArchitecture
+  X86_64
+  AARCH64
+end
+
 def main(argv = ARGV, log = Log)
+  # arch to download
+  unless arch_value = argv.shift?
+    log.error { "Architecture is required" }
+    exit 1
+  end
+
+  unless arch = SupportedArchitecture.parse?(arch_value)
+    log.error { "Unsupported architecture: #{arch_value}" }
+    exit 1
+  end
+
   # directory where to extract everything
   unless target_dir = argv.shift?
     log.error { "Target directory is required" }
@@ -76,10 +96,11 @@ def main(argv = ARGV, log = Log)
       log.debug &.emit("Formula found", name: formula.name, version: formula.version)
 
       # collect URLs
-      if file = formula.arm64_ventura?
+      file = arch.x86_64? ? formula.ventura? : formula.arm64_ventura?
+      if file
         download_entries << DownloadEntry.new(formula.name, formula.version, file[:url], file[:sha256])
       else
-        log.warn &.emit("No ARM64 Ventura download found", name: formula.name, version: formula.version)
+        log.warn &.emit("No Ventura download found for '#{arch}'", name: formula.name, version: formula.version)
       end
     end
   end

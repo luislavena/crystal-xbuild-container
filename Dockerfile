@@ -100,26 +100,31 @@ RUN --mount=type=cache,sharing=private,target=/var/cache/apk \
     set -eux -o pipefail; \
     # macOS (Ventura), supports only Apple Silicon (aarch64/arm64)
     { \
-        pkg_path="/opt/multiarch-libs/aarch64-apple-darwin"; \
-        crystal run /homebrew-downloader.cr -- \
-            $pkg_path \
-            gmp \
-            libevent \
-            libgc \
-            libiconv \
-            libsodium \
-            libxml2 \
-            libyaml \
-            openssl@3 \
-            pcre2 \
-            sqlite \
-            zlib \
-        ; \
+        supported_arch="aarch64 x86_64"; \
+        for target_arch in $supported_arch; do \
+            pkg_path="/opt/multiarch-libs/$target_arch-apple-darwin"; \
+            crystal run /homebrew-downloader.cr -- \
+                $target_arch \
+                $pkg_path \
+                gmp \
+                libevent \
+                libgc \
+                libiconv \
+                libsodium \
+                libxml2 \
+                libyaml \
+                openssl@3 \
+                pcre2 \
+                sqlite \
+                zlib \
+            ; \
+        done; \
     }
 
 # copy macOS dependencies back into `base`
 FROM base
 COPY --from=macos-packages /opt/multiarch-libs/aarch64-apple-darwin /opt/multiarch-libs/aarch64-apple-darwin
+COPY --from=macos-packages /opt/multiarch-libs/x86_64-apple-darwin /opt/multiarch-libs/x86_64-apple-darwin
 
 # install macOS SDK
 RUN --mount=type=cache,sharing=private,target=/var/cache/apk \

@@ -3,7 +3,7 @@
 set -eu
 
 # Set the list of supported target platforms
-supported_platforms="x86_64-linux-musl aarch64-linux-musl aarch64-apple-darwin"
+supported_platforms="x86_64-linux-musl aarch64-linux-musl aarch64-apple-darwin x86_64-apple-darwin"
 
 # Check if the required number of parameters is provided
 if [ $# -lt 3 ]; then
@@ -31,7 +31,7 @@ fi
 
 # Check if the target platform is supported
 case $target_platform in
-  x86_64-linux-musl|aarch64-linux-musl|aarch64-apple-darwin)
+  x86_64-linux-musl|aarch64-linux-musl|aarch64-apple-darwin|x86_64-apple-darwin)
     ;;
   *)
     echo "Error: Unsupported target platform '$target_platform'. Supported platforms are: $supported_platforms"
